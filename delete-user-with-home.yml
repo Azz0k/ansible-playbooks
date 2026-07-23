@@ -1,0 +1,23 @@
+---
+- name: Delete user with home directory
+  hosts: all
+  become: yes
+  gather_facts: false
+
+# vars:
+#   user_name: testuser
+
+  pre_tasks:
+    - name: Validate user name
+      ansible.builtin.assert:
+        that:
+          - user_name is defined
+          - user_name | length > 0
+          - user_name not in ['root', 'ansible']
+        fail_msg: "Specify a safe user_name using --extra-vars"
+  tasks:
+    - name: Delete User
+      ansible.builtin.user:
+        name: "{{ user_name }}"
+        state: absent
+        remove: true

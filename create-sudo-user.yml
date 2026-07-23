@@ -1,0 +1,59 @@
+---
+- name: Create sudoer user with SSH access
+  hosts: all
+  become: yes
+  gather_facts: false
+
+# vars:
+#   user_name: testuser
+#   user_comment: John Doe
+#   user_public_key: "ssh-ed25519 AAAA... user@example.com"
+#   user_hash: "INSERT HASH HERE (openssl passwd -6)"
+  pre_tasks:
+    - name: Validate user name
+      ansible.builtin.assert:
+        that:
+          - user_name is defined
+          - user_name | length > 0
+          - user_name not in ['root', 'ansible']
+        fail_msg: "Specify a safe user_name using --extra-vars"
+    - name: Validate user public key
+      ansible.builtin.assert:
+        that:
+          - user_public_key is defined
+          - user_public_key | length > 0
+        fail_msg: "Specify a safe user_public_key using --extra-vars"
+    - name: Validate user hash
+      ansible.builtin.assert:
+        that:
+          - user_hash is defined
+          - user_hash | length > 0
+        fail_msg: "Specify a safe user_hash using --extra-vars"
+  tasks:
+    - name: Create User
+      ansible.builtin.user:
+        name: "{{ user_name }}"
+        comment: "{{ user_comment }}"
+        password: "{{ user_hash }}"
+        update_password: on_create
+        shell: /bin/bash
+        create_home: true
+        append: yes
+        groups:
+          - sudo
+    - name: Create ssh directory
+      ansible.builtin.file:
+        dest: /home/{{ user_name }}/.ssh
+        state: directory
+        owner: "{{ user_name }}"
+        group: "{{ user_name }}"
+        mode: "0700"
+    - name: Insert public key
+      ansible.builtin.lineinfile:
+        path: "/home/{{ user_name }}/.ssh/authorized_keys"
+        line: "{{ user_public_key }}"
+        state: present
+        create: true
+        owner: "{{ user_name }}"
+        group: "{{ user_name }}"
+        mode: "0600"
