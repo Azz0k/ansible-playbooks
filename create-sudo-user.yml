@@ -1,7 +1,7 @@
 ---
 - name: Create sudoer user with SSH access
-  hosts: all
-  become: yes
+  hosts: "{{ target_host | mandatory }}"
+  become: true
   gather_facts: false
 
 # vars:
