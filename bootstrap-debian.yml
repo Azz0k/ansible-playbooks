@@ -30,6 +30,7 @@
         - mc
         - tzdata
         - git
+        - curl
       state: present
   - name: Disable IPv6
     ansible.builtin.lineinfile:
@@ -37,7 +38,7 @@
       regexp: "^GRUB_CMDLINE_LINUX_DEFAULT"
       line: "GRUB_CMDLINE_LINUX_DEFAULT=\"quiet ipv6.disable=1\""
       state: present
-    notify: update GRUB
+    notify: Update GRUB
   - name: Configure NTP
     ansible.builtin.lineinfile:
       path: "/etc/systemd/timesyncd.conf"
