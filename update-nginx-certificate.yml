@@ -32,6 +32,5 @@
         group: root
         mode: '0600'
     - name: nginx restart
-      ansible.builtin.service:
-        name: nginx
-        state: reloaded
+      ansible.builtin.command: systemctl reload nginx
+
