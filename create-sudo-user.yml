@@ -9,6 +9,7 @@
 #   user_comment: John Doe
 #   user_public_key: "ssh-ed25519 AAAA... user@example.com"
 #   user_hash: "INSERT HASH HERE (openssl passwd -6)"
+#   user_group: sudo or wheel
   pre_tasks:
     - name: Validate user name
       ansible.builtin.assert:
@@ -29,6 +30,11 @@
           - user_hash is defined
           - user_hash | length > 0
         fail_msg: "Specify a safe user_hash using --extra-vars"
+    - name: Validate user group
+      ansible.builtin.assert:
+        that:
+          - user_group is defined
+          - user_group in ['sudo','wheel']
   tasks:
     - name: Create User
       ansible.builtin.user:
@@ -40,7 +46,7 @@
         create_home: true
         append: yes
         groups:
-          - sudo
+          - {{user_group}}
     - name: Create ssh directory
       ansible.builtin.file:
         dest: /home/{{ user_name }}/.ssh
