@@ -46,7 +46,7 @@
         create_home: true
         append: yes
         groups:
-          - {{user_group}}
+          - "{{user_group}}"
     - name: Create ssh directory
       ansible.builtin.file:
         dest: /home/{{ user_name }}/.ssh
