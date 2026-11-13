@@ -1,16 +1,10 @@
 ---
-- name: Dnf update
+- name: Get kernel version
   hosts: "{{ target_host | mandatory }}"
   become: true
   gather_facts: false
 
 
   tasks:
-    - name: Upgrade all packages
-      ansible.builtin.dnf:
-        name: "*"
-        state: latest
-
-    - name: Remove unused packages
-      ansible.builtin.dnf:
-        autoremove: yes
+    - name: get version
+      ansible.builtin.command: uname -r

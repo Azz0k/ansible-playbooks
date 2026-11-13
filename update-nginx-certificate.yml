@@ -1,11 +1,36 @@
 ---
-- name: Get kernel version
+- name: Copy certificates to dest host and restart nginx
   hosts: "{{ target_host | mandatory }}"
   become: true
   gather_facts: false
 
+  # vars:
+  #   source_folder: /path/to/certs/ include a trailing slash
+  #   dest_folder: /etc/nginx/ssl/<folder>/
+  pre_tasks:
+    - name: Validate source_folder
+      ansible.builtin.assert:
+        that:
+          - source_folder is defined
+          - source_folder | length > 0
+        fail_msg: "Specify a source_folder using --extra-vars"
+    - name: Validate dest_folder
+      ansible.builtin.assert:
+        that:
+          - dest_folder is defined
+          - dest_folder | length > 0
+        fail_msg: "Specify a dest_folder using --extra-vars"
 
   tasks:
-    - name: get version
-      ansible.builtin.command: uname -r
+    - name: Copy files
+      ansible.builtin.copy:
+        backup: true
+        src: "{{ source_folder }}"
+        dest: "{{ dest_folder }}"
+        force: true
+        owner: root
+        group: root
+        mode: '0600'
+    - name: nginx restart
+      ansible.builtin.command: systemctl reload nginx
 
