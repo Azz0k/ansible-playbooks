@@ -4,19 +4,6 @@
   become: true
   gather_facts: false
 
-  # vars:
-  #  target_host: all
-
-  pre_tasks:
-    - name: Validate reboot request
-      ansible.builtin.assert:
-        that:
-          - confirm is defined
-          - confirm | bool
-          - confirm == true
-          - ansible_play_hosts_all | length == 1
-        fail_msg: "Specify confirm=true and select exactly one inventory host. Matched hosts: {{ ansible_play_hosts_all | join(', ') }}"
-
   tasks:
     - name: Reboot
       ansible.builtin.reboot:
