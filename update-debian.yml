@@ -1,0 +1,16 @@
+---
+- name: apt update and upgrade
+  hosts: "{{ target_host | mandatory }}"
+  become: true
+  gather_facts: false
+
+
+  tasks:
+    - name: Upgrade all packages
+      ansible.builtin.apt:
+        name: "*"
+        state: latest
+
+    - name: Remove unused packages
+      ansible.builtin.apt:
+        autoremove: yes
